@@ -7,22 +7,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Sunra\PhpSimple\HtmlDomParser;
 
-$guilds = [
-    'Серебряные Клинки',
-    'Рэдлайн',
-    'Ша Гордунни',
-    'Орден Черного Солнца',
-    'ПОГЛАДЬ КОТА',
-    'Котята делают КУСЬ',
-    'Гоблины украли моё аниме',
-    'Теневой совет',
-    'Безумная Вечеринка',
-    'Королевство Вейшнория',
-    'Тирания',
-    'Та сторона',
-    'Нежданчик',
-    'Шифт'
-];
+$guilds = require 'guilds.php';
 
 //$arr[] = ['Ник', 'Класс', 'Гильдия']; //Убрал чтобы остались только ники персонажей, добавить мб потом отдельной строкой
 $arr = [];
@@ -81,4 +66,4 @@ $spreadsheet->getActiveSheet()->fromArray(
     'A1'
 );
 $write = new Xlsx($spreadsheet);
-$write->save('test.xlsx');
+$write->save('output.xlsx');

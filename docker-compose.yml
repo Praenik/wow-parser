@@ -1,0 +1,16 @@
+version: '3'
+services:
+  php:
+    build: .
+    entrypoint: ["/bin/sh","-c"]
+    command:
+      - cd /home/app && php index.php
+    volumes:
+    - .:/home/app
+    links:
+      - composer
+  composer:
+    image: composer/composer
+    command: install --ignore-platform-reqs
+    volumes:
+      - .:/app
