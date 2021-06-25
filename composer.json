@@ -1,0 +1,17 @@
+{
+    "name": "admin/wowprogress_parse",
+    "authors": [
+        {
+            "name": "prae",
+            "email": "gnik2000@mail.ru"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.18",
+        "sunra/php-simple-html-dom-parser": "^1.5",
+        "guzzlehttp/guzzle": "^7.3"
+    },
+    "config": {
+        "platform-check": false
+    }
+}
