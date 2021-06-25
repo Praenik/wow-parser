@@ -3,6 +3,7 @@ require_once 'vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Sunra\PhpSimple\HtmlDomParser;
@@ -50,7 +51,7 @@ for($i=0; $i < count($arr); $i++) {
         ]);
         $rio_data = json_decode($response->getBody(), true);
         $arr[$i][3] = $rio_data['raid_progression']['castle-nathria']['summary'] ?? '';
-    }catch (ClientException $e) {
+    }catch (GuzzleException $e) {
         //тут бы отлов ошибок сделать
         $response = $e->getResponse();
         echo "$name error: {$response->getStatusCode()} - {$response->getReasonPhrase()}".PHP_EOL;
