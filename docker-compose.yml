@@ -2,15 +2,39 @@ version: '3'
 services:
   php:
     build: .
-    entrypoint: ["/bin/sh","-c"]
-    command:
-      - cd /home/app && php index.php
+    entrypoint: ["php"]
+    working_dir: "/home/app"
     volumes:
     - .:/home/app
+    env_file:
+      - .env
     links:
       - composer
+      - mysql
   composer:
     image: composer/composer
-    command: install --ignore-platform-reqs
+    command: update --ignore-platform-reqs
     volumes:
       - .:/app
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - ${DB_PORT}:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_PORT=${DB_PORT}
+      - PMA_HOST=mysql
+    links:
+      - mysql
