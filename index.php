@@ -13,6 +13,85 @@ $guilds = require 'guilds.php';
 //$arr[] = ['Ник', 'Класс', 'Гильдия']; //Убрал чтобы остались только ники персонажей, добавить мб потом отдельной строкой
 $arr = [];
 
+$classes = [
+    'Druid' => 'Друид',
+    'Monk' => 'Монах',
+    'Demon Hunter' => 'Охотник на демонов',
+    'Shaman' => 'Шаман',
+    'Hunter' => 'Охотник',
+    'Death Knight' => 'Рыцарь смерти',
+    'Mage' => 'Маг',
+    'Paladin' => 'Паладин',
+    'Priest' => 'Жрец',
+    'Warrior' => 'Воин',
+    'Rogue' => 'Разбойник',
+    'Warlock' => 'Чернокнижник'
+];
+
+$specs = [
+    'Друид' => [
+        'Restoration' => 'Исцеление',
+        'Balance' => 'Баланс',
+        'Feral' => 'Сила зверя',
+        'Guardian' => 'Страж'
+    ],
+    'Монах' => [
+        'Windwalker' => 'Танцующий с ветром',
+        'Mistweaver' => 'Ткач туманов',
+        'Brewmaster' => 'Хмелевар'
+    ],
+    'Охотник на демонов' => [
+        'Havoc' => 'Истребление',
+        'Vengeance' => 'Месть'
+    ],
+    'Охотник' => [
+        'Beast Mastery' => 'Повелитель зверей',
+        'Marksmanship' => 'Стрельба',
+        'Survival' => 'Выживание'
+    ],
+    'Рыцарь смерти' => [
+        'Frost' => 'Лед',
+        'Unholy' => 'Нечестивость',
+        'Blood' => 'Кровь'
+    ],
+    'Шаман' => [
+        'Restoration' => 'Исцеление',
+        'Elemental' => 'Стихии',
+        'Enhancement' => 'Совершенствование'
+    ],
+    'Маг' => [
+        'Frost' => 'Лед',
+        'Fire' => 'Огонь',
+        'Arcane' => 'Тайная магия'
+    ],
+    'Паладин' => [
+        'Retribution' => 'Воздаяние',
+        'Holy' => 'Свет',
+        'Protection' => 'Защита',
+    ],
+    'Жрец' => [
+        'Shadow' => 'Тьма',
+        'Discipline' => 'Послушание',
+        'Holy' => 'Свет'
+    ],
+    'Воин' => [
+        'Fury' => 'Неистовство',
+        'Arms' => 'Оружие',
+        'Protection' => 'Защита'
+    ],
+    'Разбойник' => [
+        'Outlaw' => 'Головорез',
+        'Assassination' => 'Ликвидация',
+        'Subtlety' => 'Скрытность'
+    ],
+    'Чернокнижник' => [
+        'Destruction' => 'Разрушение',
+        'Demonology' => 'Демонология',
+        'Affliction' => 'Колдовство'
+    ]
+];
+
+// Парсинг wowprogress.com
 echo "Parsing wowprogress.com".PHP_EOL;
 foreach ($guilds as $guild) {
     echo "Parse $guild".PHP_EOL;
@@ -25,9 +104,8 @@ foreach ($guilds as $guild) {
         $player['rank'] = $row->find('td', 0);
         if ($player['rank']->plaintext > 2) {
             $player['name'] = str_replace(' (u)','',$row->find('td', 1)->plaintext);
-            $player['class'] = $row->class;
-            //    echo $player['name'] . ' | ' . $player['class'] . "<br>";
-            $arr[] = [$player['name'], $player['class'], $guild];
+            $player['rank'] = (int)$player['rank']->plaintext;
+            $arr[] = [$player['name'], $guild, $player['rank']];
         }
     }
 }
@@ -46,12 +124,16 @@ for($i=0; $i < count($arr); $i++) {
                 'region' => 'eu',
                 'realm' => 'Gordunni',
                 'name' => $name,
-                'fields' => 'raid_progression'
+                'fields' => 'class,gear,active_spec_name,mythic_plus_scores,raid_progression'
             ]
         ]);
         $rio_data = json_decode($response->getBody(), true);
-        $arr[$i][3] = $rio_data['raid_progression']['castle-nathria']['summary'] ?? '';
-    }catch (GuzzleException $e) {
+        array_push($arr[$i], $classes[$rio_data['class']] ?? '',
+            $specs[$classes[$rio_data['class']]][$rio_data['active_spec_name']] ?? '',
+            $rio_data['gear']['item_level_equipped'] ?? '',
+            $rio_data['mythic_plus_scores']['all'] ?? '',
+            $rio_data['raid_progression']['castle-nathria']['summary'] ?? '');
+    } catch (GuzzleException $e) {
         //тут бы отлов ошибок сделать
         $response = $e->getResponse();
         echo "$name error: {$response->getStatusCode()} - {$response->getReasonPhrase()}".PHP_EOL;
