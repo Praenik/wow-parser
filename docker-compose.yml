@@ -1,25 +1,19 @@
 version: '3'
 services:
-  php:
+  app:
     build: .
-    entrypoint: ["php"]
     working_dir: "/home/app"
     volumes:
     - .:/home/app
     env_file:
       - .env
     links:
-      - composer
       - mysql
-  composer:
-    image: composer/composer
-    command: update --ignore-platform-reqs
-    volumes:
-      - .:/app
   mysql:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
-    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
     ports:
       - ${DB_PORT}:3306
     environment:
@@ -29,7 +23,6 @@ services:
       MYSQL_PASSWORD: ${DB_PASS}
   phpmyadmin:
     image: phpmyadmin
-    restart: always
     ports:
       - 8081:80
     environment:
@@ -38,3 +31,5 @@ services:
       - PMA_HOST=mysql
     links:
       - mysql
+volumes:
+  mysql-data:
